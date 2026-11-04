@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Merchant {
+  id          String       @id @default(cuid())
+  name        String
+  email       String       @unique
+  plan        String       @default("starter")
+  createdAt   DateTime     @default(now())
+  apiKeys     ApiKey[]
+  storeConfig StoreConfig?
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  merchantId String
+  keyHash    String    @unique
+  publicKey  String?   @unique
+  prefix     String
+  isActive   Boolean   @default(true)
+  lastUsedAt DateTime?
+  merchant   Merchant  @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+  createdAt  DateTime  @default(now())
+  @@index([merchantId, isActive])
+}
+
+model StoreConfig {
+  id            String   @id @default(cuid())
+  merchantId    String   @unique
+  primaryColor  String   @default("#6d5dfc")
+  widgetPosition String  @default("bottom-right")
+  brandName     String   @default("Shopmate AI")
+  merchant      Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
+}
