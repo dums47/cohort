@@ -1,2 +1,60 @@
-const merchants = [["Acme Outfitters", "acme.example", "Pro", "Active"], ["Northstar Goods", "northstar.co", "Scale", "Active"], ["Demo Store", "demo-store.dev", "Free", "Review"]]
-export default function AdminMerchantsPage() { return <section className="p-6 md:p-10"><div className="mx-auto max-w-6xl"><p className="text-sm font-medium text-primary">Super-admin panel</p><h1 className="mt-2 text-3xl font-semibold tracking-tight">Merchants</h1><p className="mt-2 text-muted-foreground">Inspect tenant plans, account health, and access state.</p><div className="mt-8 overflow-hidden rounded-2xl border border-border bg-card"><table className="w-full text-left text-sm"><thead className="border-b border-border text-muted-foreground"><tr>{["Merchant","Domain","Plan","Status","Action"].map((x) => <th key={x} className="px-5 py-4 font-medium">{x}</th>)}</tr></thead><tbody>{merchants.map((r) => <tr key={r[1]} className="border-b border-border last:border-0"><td className="px-5 py-4 font-medium">{r[0]}</td><td className="px-5 py-4 text-muted-foreground">{r[1]}</td><td className="px-5 py-4">{r[2]}</td><td className="px-5 py-4 text-emerald-600">{r[3]}</td><td className="px-5 py-4"><button className="rounded-lg border border-border px-3 py-1.5 text-xs hover:bg-muted">Inspect</button></td></tr>)}</tbody></table></div></div></section> }
+import { database } from "@/lib/auth"
+
+type MerchantRow = {
+  id: string
+  name: string
+  email: string
+  plan: string
+  createdAt: Date
+  apiKeyCount: number
+}
+
+export default async function AdminMerchantsPage() {
+  const result = await database.query<MerchantRow>(
+    `SELECT m.id, m.name, m.email, m.plan, m."createdAt",
+            COUNT(k.id)::int AS "apiKeyCount"
+     FROM "Merchant" m
+     LEFT JOIN "ApiKey" k ON k."merchantId" = m.id AND k."isActive" = TRUE
+     GROUP BY m.id
+     ORDER BY m."createdAt" DESC`,
+  )
+
+  return (
+    <section className="p-6 md:p-10">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-sm font-medium text-primary">Super-admin panel</p>
+        <h1 className="mt-2 text-3xl font-semibold tracking-tight">Merchants</h1>
+        <p className="mt-2 text-muted-foreground">Merchant accounts registered in the database.</p>
+        <div className="mt-8 overflow-x-auto rounded-2xl border border-border bg-card">
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-border text-muted-foreground">
+              <tr>
+                {["Merchant", "Email", "Plan", "Active API keys", "Created"].map((heading) => (
+                  <th key={heading} className="px-5 py-4 font-medium">{heading}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {result.rows.map((merchant) => (
+                <tr key={merchant.id} className="border-b border-border last:border-0">
+                  <td className="px-5 py-4 font-medium">{merchant.name}</td>
+                  <td className="px-5 py-4 text-muted-foreground">{merchant.email}</td>
+                  <td className="px-5 py-4 capitalize">{merchant.plan}</td>
+                  <td className="px-5 py-4">{merchant.apiKeyCount}</td>
+                  <td className="px-5 py-4 text-muted-foreground">{merchant.createdAt.toLocaleDateString()}</td>
+                </tr>
+              ))}
+              {result.rows.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="px-5 py-10 text-center text-muted-foreground">
+                    No merchant accounts have been created yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  )
+}

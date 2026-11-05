@@ -85,7 +85,7 @@ export async function requireMerchant(request: Request): Promise<MerchantContext
     storeConfig: {
       primaryColor: merchant.primaryColor ?? "#6d5dfc",
       widgetPosition: merchant.widgetPosition ?? "bottom-right",
-      brandName: merchant.brandName ?? "Shopmate AI",
+      brandName: merchant.brandName ?? "Naturalsearch",
     },
   }
 }

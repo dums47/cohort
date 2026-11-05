@@ -1,8 +1,35 @@
-"use client"
+import { Activity, Users } from "lucide-react"
+import { database } from "@/lib/auth"
 
-import { Activity, Database, Gauge, Server, ShieldCheck, Users } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
+export default async function AdminPage() {
+  const result = await database.query<{ merchantCount: string }>(
+    'SELECT COUNT(*)::text AS "merchantCount" FROM "Merchant"',
+  )
 
-const metrics = [["Active tenants", "248", "+12 this week", Users], ["API requests", "1.84M", "+18.4%", Activity], ["p95 latency", "184ms", "-24ms", Gauge], ["Error rate", "0.08%", "Within SLO", ShieldCheck]] as const
-
-export default function AdminPage() { return <main className="min-h-screen bg-background text-foreground"><header className="border-b border-border bg-card"><div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4"><div><p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Shopmate Control Plane</p><h1 className="mt-1 text-xl font-semibold">System state</h1></div><ThemeToggle /></div></header><div className="mx-auto flex max-w-7xl flex-col gap-6 px-6 py-8"><div className="flex items-center gap-2 rounded-2xl border border-emerald-500/20 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-700 dark:text-emerald-300"><Server className="size-4" /> All production systems operational</div><section className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">{metrics.map(([label, value, detail, Icon]) => <article key={label} className="rounded-2xl border border-border bg-card p-5"><div className="flex items-center justify-between"><p className="text-sm text-muted-foreground">{label}</p><Icon className="size-4 text-primary" /></div><p className="mt-4 text-3xl font-semibold tracking-tight">{value}</p><p className="mt-1 text-xs text-muted-foreground">{detail}</p></article>)}</section><section className="grid gap-6 lg:grid-cols-2"><article className="rounded-2xl border border-border bg-card p-6"><div className="flex items-center gap-3"><Database className="size-5 text-primary" /><div><h2 className="font-semibold">Service health</h2><p className="text-sm text-muted-foreground">Live checks across the platform.</p></div></div><div className="mt-6 flex flex-col gap-4">{["Search API", "Postgres / Neon", "Widget CDN", "AI Gateway"].map((service) => <div key={service} className="flex items-center justify-between border-b border-border pb-3 text-sm last:border-0"><span>{service}</span><span className="flex items-center gap-2 text-emerald-600"><span className="size-2 rounded-full bg-emerald-500" /> Healthy</span></div>)}</div></article><article className="rounded-2xl border border-border bg-card p-6"><h2 className="font-semibold">Global request volume</h2><p className="mt-1 text-sm text-muted-foreground">Requests by hour, last 24 hours.</p><div className="mt-8 flex h-32 items-end gap-2">{[42,58,49,72,66,84,61,76,92,70,80,96,74,88,67,82,94,78,86,99,82,91,76,88].map((height, index) => <div key={index} className="flex-1 rounded-t-md bg-primary/70" style={{ height: `${height}%` }} />)}</div><div className="mt-3 flex justify-between text-xs text-muted-foreground"><span>24h ago</span><span>Now</span></div></article></section></div></main> }
+  return (
+    <section className="flex flex-col gap-6 p-6 md:p-10">
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Naturalsearch Control Plane</p>
+        <h1 className="mt-1 text-3xl font-semibold tracking-tight">System state</h1>
+      </div>
+      <article className="max-w-sm rounded-2xl border border-border bg-card p-5">
+        <div className="flex items-center justify-between">
+          <p className="text-sm text-muted-foreground">Merchant accounts</p>
+          <Users aria-hidden="true" className="size-4 text-primary" />
+        </div>
+        <p className="mt-4 text-3xl font-semibold tracking-tight">{result.rows[0].merchantCount}</p>
+      </article>
+      <article className="rounded-2xl border border-border bg-card p-5">
+        <div className="flex items-center gap-3">
+          <Activity aria-hidden="true" className="size-5 text-muted-foreground" />
+          <div>
+            <h2 className="font-semibold">Request activity</h2>
+            <p className="text-sm text-muted-foreground">
+              Request metrics are not available because API request logging is not configured.
+            </p>
+          </div>
+        </div>
+      </article>
+    </section>
+  )
+}

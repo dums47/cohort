@@ -35,6 +35,6 @@ model StoreConfig {
   merchantId    String   @unique
   primaryColor  String   @default("#6d5dfc")
   widgetPosition String  @default("bottom-right")
-  brandName     String   @default("Shopmate AI")
+  brandName     String   @default("Naturalsearch")
   merchant      Merchant @relation(fields: [merchantId], references: [id], onDelete: Cascade)
 }

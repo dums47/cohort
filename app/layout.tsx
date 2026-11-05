@@ -4,7 +4,7 @@ import './globals.css'
 import { ThemeBootstrap } from '@/components/theme-bootstrap'
 
 export const metadata: Metadata = {
-  title: 'Shopmate Console',
+  title: 'Naturalsearch Console',
   description: 'Merchant search and system operations console.',
   generator: 'v0.app',
   icons: {
