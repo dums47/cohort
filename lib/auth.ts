@@ -14,7 +14,7 @@ const baseURL =
 
 
 const trustedOrigins = [
-  "http://localhost:3000",
+  "https://shopmate-flax.vercel.app/",
   ...[process.env.BETTER_AUTH_URL, process.env.V0_RUNTIME_URL, process.env.V0_DEV_APP_URL, process.env.V0_BUILD_URL, process.env.V0_SANDBOX_URL]
     .filter((value): value is string => Boolean(value)),
   ...[process.env.VERCEL_URL, process.env.VERCEL_PROJECT_PRODUCTION_URL]
