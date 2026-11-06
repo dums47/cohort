@@ -2,7 +2,7 @@ import { streamText, tool } from "ai"
 import { z } from "zod"
 import { NextResponse } from "next/server"
 import { requireMerchant } from "@/lib/auth"
-import { searchMerchantCatalog } from "@/lib/typesense"
+import { searchMerchantCatalog } from "@/lib/meilisearch"
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
       maxOutputTokens: 700,
       tools: {
         searchCatalog: tool({
-          description: "Search this merchant's catalog using Typesense.",
+          description: "Search this merchant's catalog using Meilisearch.",
           inputSchema: z.object({ query: z.string(), limit: z.number().int().min(1).max(12).default(6) }),
           execute: async ({ query, limit }) => {
             const products = await searchMerchantCatalog(merchant.merchantId, query, limit)

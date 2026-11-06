@@ -2,7 +2,6 @@ import { createHash } from "node:crypto"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { auth, getOrCreateMerchant, hasSameOrigin } from "@/lib/auth"
-// 1. Swap Typesense for Meilisearch helper functions
 import { CatalogDocument, ensureMerchantCatalog, importCatalogBatch } from "@/lib/meilisearch"
 
 export const runtime = "nodejs"

@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto"
 import { NextResponse } from "next/server"
 import { requireMerchant } from "@/lib/auth"
-import { CatalogDocument, ensureMerchantCatalog, importCatalogBatch } from "@/lib/typesense"
+import { CatalogDocument, ensureMerchantCatalog, importCatalogBatch } from "@/lib/meilisearch"
 
 export const runtime = "nodejs"
 
@@ -95,7 +95,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ collection, indexed, failed, skipped, total: products.length }, { status: failed ? 207 : 200 })
   } catch (error) {
     const message = error instanceof Error ? error.message : "Product sync failed"
-    console.error("Typesense product sync failed", error)
-    return NextResponse.json({ error: message }, { status: message === "Typesense is not configured" ? 503 : 502 })
+    console.error("Meilisearch product sync failed", error)
+    return NextResponse.json({ error: message }, { status: message === "Meilisearch is not configured" ? 503 : 502 })
   }
 }
