@@ -4,10 +4,11 @@ import { betterAuth } from "better-auth"
 
 export const database = new Pool({ connectionString: process.env.DATABASE_URL })
 
-const baseURL = process.env.BETTER_AUTH_URL
+const baseURL = process.env.BETTER_AUTH_URL|| https://shopmate-flax.vercel.app
   ?? (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : undefined)
   ?? (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : undefined)
   ?? process.env.V0_RUNTIME_URL
+  
 
 const trustedOrigins = [
   "http://localhost:3000",
