@@ -48,7 +48,7 @@ export default function SignUpPage() {
     <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
       <form onSubmit={submit} aria-busy={isSubmitting} className="flex w-full max-w-sm flex-col gap-5 rounded-3xl border border-border bg-card p-8 shadow-sm">
         <div>
-          <p className="text-sm font-semibold text-primary">Naturalsearch Console</p>
+          <p className="text-sm font-semibold text-primary">ShopMate Console</p>
           <h1 className="mt-2 text-3xl font-semibold tracking-tight">Create your account</h1>
           <p className="mt-2 text-sm text-muted-foreground">Start powering better product discovery.</p>
         </div>

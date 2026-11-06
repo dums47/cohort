@@ -9,7 +9,7 @@ export default async function AdminPage() {
   return (
     <section className="flex flex-col gap-6 p-6 md:p-10">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">Naturalsearch Control Plane</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-primary">ShopMate Control Plane</p>
         <h1 className="mt-1 text-3xl font-semibold tracking-tight">System state</h1>
       </div>
       <article className="max-w-sm rounded-2xl border border-border bg-card p-5">

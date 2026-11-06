@@ -42,7 +42,7 @@ export default function DashboardPage() {
           <p className="mt-1 text-xs text-muted-foreground">Make the assistant feel native to your storefront.</p>
         </div>
         <div className="flex flex-col gap-5 p-5">
-          <label className="flex flex-col gap-2 text-sm font-medium">Brand name<input className="rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-[#6d5dfc]" defaultValue="Naturalsearch" /></label>
+          <label className="flex flex-col gap-2 text-sm font-medium">Brand name<input className="rounded-xl border border-input px-3 py-2.5 text-sm outline-none focus:border-[#6d5dfc]" defaultValue="ShopMate" /></label>
           <label className="flex flex-col gap-2 text-sm font-medium">Primary color
             <div className="flex items-center gap-3">
               <input type="color" value={color} onChange={(event) => setColor(event.target.value)} className="size-10 cursor-pointer rounded-lg border-0 bg-transparent" />
@@ -52,7 +52,7 @@ export default function DashboardPage() {
           <div className="rounded-2xl bg-muted p-4">
             <div className="mb-3 flex items-center gap-2 text-xs font-semibold text-muted-foreground"><Sparkles className="size-3.5" style={{ color }} /> Live preview</div>
             <div className="flex items-center justify-between rounded-xl bg-card p-3 shadow-sm">
-              <span className="text-sm font-semibold">Naturalsearch</span>
+              <span className="text-sm font-semibold">ShopMate</span>
               <span className="flex size-8 items-center justify-center rounded-full text-white" style={{ backgroundColor: color }}><Sparkles className="size-4" /></span>
             </div>
           </div>

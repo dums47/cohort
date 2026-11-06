@@ -54,7 +54,7 @@ export function PortalShell({ children, admin = false, canAccessAdmin = false }:
       <aside className="fixed inset-y-0 left-0 hidden w-64 border-r border-border bg-card/80 p-5 backdrop-blur lg:block">
         <Link href={admin ? "/admin" : "/dashboard"} className="flex items-center gap-3 text-lg font-semibold tracking-tight">
           <span className="grid size-9 place-items-center rounded-xl bg-primary font-mono text-sm text-primary-foreground">S</span>
-          Naturalsearch <span className="text-xs text-muted-foreground">{admin ? "admin" : "merchant"}</span>
+          ShopMate <span className="text-xs text-muted-foreground">{admin ? "admin" : "merchant"}</span>
         </Link>
         <nav className="mt-12 flex flex-col gap-2" aria-label={admin ? "Admin navigation" : "Merchant navigation"}>
           {nav.map(([label, href]) => (
@@ -84,7 +84,7 @@ export function PortalShell({ children, admin = false, canAccessAdmin = false }:
       <header className="flex items-center justify-between border-b border-border bg-card/80 px-4 py-3 lg:hidden">
         <Link href={admin ? "/admin" : "/dashboard"} className="flex items-center gap-2 font-semibold tracking-tight">
           <span className="grid size-8 place-items-center rounded-lg bg-primary font-mono text-sm text-primary-foreground">S</span>
-          Naturalsearch
+          ShopMate
         </Link>
         <Button
           type="button"
