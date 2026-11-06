@@ -2,7 +2,8 @@ import { createHash } from "node:crypto"
 import { headers } from "next/headers"
 import { NextResponse } from "next/server"
 import { auth, getOrCreateMerchant, hasSameOrigin } from "@/lib/auth"
-import { CatalogDocument, ensureMerchantCatalog, importCatalogBatch } from "@/lib/typesense"
+// 1. Swap Typesense for Meilisearch helper functions
+import { CatalogDocument, ensureMerchantCatalog, importCatalogBatch } from "@/lib/meilisearch"
 
 export const runtime = "nodejs"
 
@@ -169,8 +170,8 @@ export async function POST(request: Request) {
     )
   } catch (error) {
     const message = error instanceof Error ? error.message : "Catalog import failed"
-    console.error("Typesense catalog upload failed", error)
-    const status = message === "Typesense is not configured" ? 503 : 502
+    console.error("Meilisearch catalog upload failed", error)
+    const status = message === "Meilisearch is not configured" ? 503 : 502
     return NextResponse.json({ error: message }, { status })
   }
 }
