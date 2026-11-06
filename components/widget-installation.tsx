@@ -197,7 +197,7 @@ export function WidgetInstallation() {
           {syncingCatalog && <LoaderCircle className="size-4 animate-spin" />}
           {syncingCatalog ? "Syncing catalog..." : "Sync catalog"}
         </button>
-        <p className="text-xs text-muted-foreground">Requires a public HTTPS store with a sitemap and Product JSON-LD.</p>
+        <p className="text-xs text-muted-foreground">For a localhost store, run the sync script on your computer. This button requires a public HTTPS store with a sitemap and Product JSON-LD.</p>
       </div>
       {syncMessage && <p role="status" className="mt-3 text-sm text-emerald-600 dark:text-emerald-400">{syncMessage}</p>}
     </div>

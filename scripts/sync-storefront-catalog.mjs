@@ -2,6 +2,7 @@
 
 import { lookup } from "node:dns/promises"
 import { isIP } from "node:net"
+import http from "node:http"
 import https from "node:https"
 import { pathToFileURL } from "node:url"
 
@@ -20,7 +21,10 @@ Environment:
   SHOPMATE_API_KEY  Merchant publishable key (pk_live_...)
 
 The storefront must expose product pages in its XML sitemap and publish Product
-JSON-LD on those pages. Products are sent to POST /api/v1/products/sync.`)
+JSON-LD on those pages. Products are sent to POST /api/v1/products/sync.
+Local storefronts (localhost/127.0.0.1) are supported when you run this script
+on the same computer, for example:
+  node scripts/sync-storefront-catalog.mjs http://localhost:3000`)
 }
 
 function normalizeUrl(value, base) {
@@ -43,20 +47,41 @@ function xmlDecode(value) {
     .replace(/&apos;/g, "'")
 }
 
-async function fetchText(url) {
+function isLocalhostName(hostname) {
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "")
+  if (host === "localhost" || host === "::1") return true
+  if (isIP(host) !== 4) return false
+  return Number(host.split(".")[0]) === 127
+}
+
+function isLoopbackAddress(address) {
+  const host = address.toLowerCase().replace(/^\[|\]$/g, "")
+  if (host === "::1") return true
+  return isIP(host) === 4 && Number(host.split(".")[0]) === 127
+}
+
+async function fetchText(url, { allowLocalhost = false } = {}) {
   const parsedUrl = new URL(url)
-  if (parsedUrl.protocol !== "https:" || (parsedUrl.port && parsedUrl.port !== "443") || parsedUrl.username || parsedUrl.password) {
+  const localTarget = isLocalhostName(parsedUrl.hostname)
+  if (parsedUrl.username || parsedUrl.password ||
+      (localTarget && !allowLocalhost) ||
+      (!localTarget && (parsedUrl.protocol !== "https:" || (parsedUrl.port && parsedUrl.port !== "443") || isIP(parsedUrl.hostname) !== 0)) ||
+      (localTarget && parsedUrl.protocol !== "http:" && parsedUrl.protocol !== "https:")) {
     throw new Error("Only public HTTPS storefront URLs are supported.")
   }
 
   const requestUrl = async (target, redirectsLeft) => new Promise((resolve, reject) => {
-    const request = https.get(target, {
+    const transport = target.protocol === "https:" ? https : http
+    const request = transport.get(target, {
       headers: { "User-Agent": "ShopMateCatalogSync/1.0" },
       lookup(hostname, options, callback) {
         lookup(hostname, { all: true, verbatim: true })
           .then((addresses) => {
-            if (!addresses.length || addresses.some(({ address }) => !isPublicAddress(address))) {
-              callback(new Error("Storefront resolves to a non-public IP address."))
+            const addressIsAllowed = localTarget ? isLoopbackAddress : isPublicAddress
+            if (!addresses.length || addresses.some(({ address }) => !addressIsAllowed(address))) {
+              callback(new Error(localTarget
+                ? "Local storefront must resolve only to loopback addresses."
+                : "Storefront resolves to a non-public IP address."))
               return
             }
             if (options && typeof options === "object" && "all" in options && options.all) {
@@ -136,10 +161,10 @@ function isPublicAddress(address) {
     !normalized.startsWith("2001:0:")
 }
 
-async function findSitemapUrls(siteUrl) {
+async function findSitemapUrls(siteUrl, options) {
   const sitemapUrls = new Set()
   try {
-    const robots = await fetchText(new URL("/robots.txt", siteUrl).href)
+    const robots = await fetchText(new URL("/robots.txt", siteUrl).href, options)
     for (const line of robots.split(/\r?\n/)) {
       const match = line.match(/^\s*Sitemap:\s*(\S+)/i)
       if (match) {
@@ -165,7 +190,7 @@ async function findSitemapUrls(siteUrl) {
 
     let xml
     try {
-      xml = await fetchText(sitemapUrl)
+      xml = await fetchText(sitemapUrl, options)
     } catch (error) {
       console.warn(`Skipping sitemap ${sitemapUrl}: ${error.message}`)
       continue
@@ -262,14 +287,18 @@ export function extractProducts(html, pageUrl) {
   return products
 }
 
-export async function discoverCatalogProducts(siteArgument) {
+export async function discoverCatalogProducts(siteArgument, { allowLocalhost = false } = {}) {
   const siteUrl = normalizeUrl(siteArgument ?? "", "https://invalid.local")
+  const localTarget = siteUrl && isLocalhostName(siteUrl.hostname)
   if (!siteArgument || !siteUrl || siteUrl.hostname === "invalid.local" ||
-      siteUrl.protocol !== "https:" || siteUrl.username || siteUrl.password ||
-      (siteUrl.port && siteUrl.port !== "443") || isIP(siteUrl.hostname) !== 0) {
+      (localTarget
+        ? !allowLocalhost || (siteUrl.protocol !== "http:" && siteUrl.protocol !== "https:")
+        : siteUrl.protocol !== "https:" || (siteUrl.port && siteUrl.port !== "443") || isIP(siteUrl.hostname) !== 0) ||
+      siteUrl.username || siteUrl.password) {
     throw new Error("Provide a public storefront URL using HTTPS and a domain name.")
   }
-  const pageUrls = await findSitemapUrls(siteUrl)
+  const options = { allowLocalhost }
+  const pageUrls = await findSitemapUrls(siteUrl, options)
   if (pageUrls.length === 0) {
     throw new Error(`No storefront pages found in the sitemap for ${siteUrl.origin}.`)
   }
@@ -279,7 +308,7 @@ export async function discoverCatalogProducts(siteArgument) {
   for (let index = 0; index < pageUrls.length; index += 1) {
     const pageUrl = pageUrls[index]
     try {
-      const html = await fetchText(pageUrl)
+      const html = await fetchText(pageUrl, options)
       for (const product of extractProducts(html, pageUrl)) {
         const identity = product.sku || product.url || `${product.title}\n${product.price}\n${product.image_url ?? ""}`
         productsByIdentity.set(identity, product)
@@ -313,7 +342,7 @@ async function main() {
   if (!apiUrl || apiUrl.hostname === "invalid.local") throw new Error("Set SHOPMATE_API_URL.")
   if (!apiKey?.startsWith("pk_live_")) throw new Error("Set SHOPMATE_API_KEY to the merchant publishable key.")
 
-  const { products, pagesScanned, pageErrors } = await discoverCatalogProducts(siteArgument)
+  const { products, pagesScanned, pageErrors } = await discoverCatalogProducts(siteArgument, { allowLocalhost: true })
   const endpoint = new URL("/api/v1/products/sync", apiUrl)
   for (let offset = 0; offset < products.length; offset += batchSize) {
     const batch = products.slice(offset, offset + batchSize)
