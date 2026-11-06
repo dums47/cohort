@@ -1,8 +1,13 @@
+import { createOpenAI } from "@ai-sdk/openai"
 import { streamText, tool } from "ai"
 import { z } from "zod"
 import { NextResponse } from "next/server"
 import { requireMerchant } from "@/lib/auth"
 import { searchMerchantCatalog } from "@/lib/meilisearch"
+
+const directOpenAI = createOpenAI({
+  apiKey: process.env.OPENAI_API_KEY,
+})
 
 export async function OPTIONS() {
   return new NextResponse(null, {
@@ -21,7 +26,7 @@ export async function POST(request: Request) {
     const { messages } = await request.json()
 
     const result = streamText({
-      model: "openai/gpt-4o",
+      model: directOpenAI("gpt-4o"),
       messages,
       maxOutputTokens: 700,
       tools: {
