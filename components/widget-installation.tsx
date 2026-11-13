@@ -160,7 +160,7 @@ export function WidgetInstallation() {
     }, verificationTimeoutMs)
   }
 
-  return <div className="rounded-2xl border border-border bg-card p-5">
+  return <div className="rounded-2xl border border-slate-200 dark:border-[#1b4852] bg-white dark:bg-[#11343A] p-6 shadow-sm transition-colors">
     <div className="flex items-center gap-2 text-sm font-semibold"><Sparkles className="size-4 text-primary" /> Embed AI Search Widget</div>
     <p className="mt-2 text-sm text-muted-foreground">Copy this script into your site before the closing <code className="font-mono text-foreground">&lt;/body&gt;</code> tag, then sync the catalog below. The widget searches products after they have been imported.</p>
 

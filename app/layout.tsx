@@ -4,8 +4,8 @@ import './globals.css'
 import { ThemeBootstrap } from '@/components/theme-bootstrap'
 
 export const metadata: Metadata = {
-  title: 'ShopMate Console',
-  description: 'Merchant search and system operations console.',
+  title: 'ShopMate — AI-Powered E-Commerce Search API',
+  description: 'Search Smarter. Shop Better. A developer-first API that turns everyday shopping language into structured product search.',
   generator: 'v0.app',
   icons: {
     icon: [
@@ -29,8 +29,8 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   colorScheme: 'light dark',
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: 'white' },
-    { media: '(prefers-color-scheme: dark)', color: 'black' },
+    { media: '(prefers-color-scheme: dark)', color: '#0d272c' },
+    { media: '(prefers-color-scheme: light)', color: '#0d272c' },
   ],
 }
 
@@ -41,7 +41,22 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="antialiased transition-colors duration-300">
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..800;1,9..144,400..800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+          rel="stylesheet"
+        />
+        {/* FontAwesome 6 CDN - universal font & SVG icon support */}
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+          crossOrigin="anonymous"
+          referrerPolicy="no-referrer"
+        />
+      </head>
+      <body className="antialiased bg-background text-foreground selection:bg-[#159478] selection:text-white transition-colors duration-300">
         <ThemeBootstrap />
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}
